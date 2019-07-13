@@ -4,6 +4,7 @@ use std::clone::Clone;
 use std::collections::HashMap;
 use std::io::{self, BufReader};
 use std::net::{Shutdown, SocketAddr, TcpStream, ToSocketAddrs};
+use std::time::Duration;
 
 use log::debug;
 use nom::IResult;
@@ -256,6 +257,14 @@ impl StreamConnect {
 			local_port: self.local_port,
 		})
 	}
+
+  pub fn set_read_timeout(&self, duration: Option<Duration>) -> Result<(), Error> {
+    self.sam.conn.set_read_timeout(duration).map_err(|_| ErrorKind::SAMTimeout("can't set read timeout".into()).into())
+  }
+
+  pub fn set_write_timeout(&self, duration: Option<Duration>) -> Result<(), Error> {
+    self.sam.conn.set_write_timeout(duration).map_err(|_| ErrorKind::SAMTimeout("can't set write timeout".into()).into())
+  }
 }
 
 impl Read for StreamConnect {
