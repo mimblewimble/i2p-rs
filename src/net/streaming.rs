@@ -3,6 +3,7 @@ use std::io::prelude::*;
 use std::fmt;
 use std::io;
 use std::net::{Shutdown, SocketAddr, ToSocketAddrs};
+use std::time::Duration;
 
 use crate::error::{Error, ErrorKind};
 use crate::net::{I2pAddr, I2pSocketAddr, ToI2pSocketAddrs};
@@ -186,6 +187,38 @@ impl I2pStream {
 	pub fn try_clone(&self) -> Result<I2pStream, Error> {
 		self.inner.duplicate().map(|s| I2pStream { inner: s })
 	}
+
+  /// Set the read timeout on the inner TcpStream
+	/// # Examples
+	///
+	/// ```no_run
+  /// use std::time::Duration;
+  /// use i2p::net::I2pStream;
+  ///
+	/// let stream = I2pStream::connect("example.i2p:8080")
+	///                        .expect("Couldn't connect to the server...");
+  /// stream.set_read_timeout(Some(Duration::new(0, 0)))
+  ///       .expect("Couldn't set read timeout...")
+  /// ```
+  pub fn set_read_timeout(&self, duration: Option<Duration>) -> Result<(), Error> {
+    self.inner.set_read_timeout(duration)
+  }
+
+  /// Set the write timeout on the inner TcpStream
+	/// # Examples
+	///
+	/// ```no_run
+  /// use std::time::Duration;
+  /// use i2p::net::I2pStream;
+  ///
+	/// let stream = I2pStream::connect("example.i2p:8080")
+	///                        .expect("Couldn't connect to the server...");
+  /// stream.set_write_timeout(Some(Duration::new(0, 0)))
+  ///       .expect("Couldn't set write timeout...")
+  /// ```
+  pub fn set_write_timeout(&self, duration: Option<Duration>) -> Result<(), Error> {
+    self.inner.set_write_timeout(duration)
+  }
 }
 
 impl Read for I2pStream {
